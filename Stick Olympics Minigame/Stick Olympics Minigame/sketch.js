@@ -5,7 +5,8 @@ var images = [];
 var navbar;
 var soundpaths = ["media/sounds/menumusic.mp3"];
 var sounds = [];
-
+var gifpaths = ['media/animatedimages/olympicrings.gif','media/animatedimages/sprintstick.gif']
+var gifs = [];
 var sliders = []; // slider[0] = background volume, slider[1] = ingame sfx volume
 
 function setup() {
@@ -22,18 +23,22 @@ function setup() {
 }
 
 function preload() {
+  console.log("hello")
   for (var i = 0; i < imagepaths.length; i++)
     images[i] = loadImage(imagepaths[i]);
 
   for (var i = 0; i < soundpaths.length; i++)
     sounds[i] = loadSound(soundpaths[i]);
+  
+    for (var i = 0; i < gifpaths.length; i++){
+    gifs[i] = loadGif(gifpaths[i]);}
+
 
 }
 
 function draw() {
 
   gamestate();
-  console.log(mouseIsPressed);
 }
 
 function loadScreen() {
@@ -44,19 +49,19 @@ function loadScreen() {
   textFont("Comic Sans MS");
   text("Welcome to the Stick Olympics Minigame!!!", width / 2, height * .1);
 
-  //var gif = loadGif('media/animatedimages/olympicrings.gif');
-  //image(gif, width/2, height*.3);
+ 
+  image(gifs[0], width/2, height*.8);
 
   textSize(48);
-  text("Pick an Option Below!!!", width / 2, height / 2);
+  text("Pick an Option Below!!!", width / 2, height * .2);
 
   var editathletebutton = new button(width * .8, height * .9, "Edit your Athlete", editAthleteScreen, 'medium', 'navigate');
   editathletebutton.createButton();
   user.stand();
   var optionsbutton = new button(width * .2, height * .9, "Options", optionScreen, 'medium', 'navigate');
   optionsbutton.createButton();
-  var optionsbutton = new button(width / 2, height * .9, "Begin", eventsScreen, 'large', 'navigate');
-  optionsbutton.createButton();
+  var beginbutton = new button(width / 2, height/2, "Begin", eventsScreen, 'large', 'navigate');
+  beginbutton.createButton();
 }
 
 function eventsScreen() {
@@ -81,7 +86,7 @@ function eventsScreen() {
   stroke(0);
   rectMode(CORNERS);
   rect (width *.05, height*.25, width*.5, height *.75,25)
-    var sport = [new icon(width * .1, height * .35, images[8], '100m Sprint', null, 'medium', 'sport'),new icon(width * .1, height * .35 +(110), images[8], '100m Swim', null, 'medium', 'sport')]
+    var sport = [new icon(width * .1, height * .35, images[8], '100m Sprint', sprint, 'medium', 'sport'),new icon(width * .1, height * .35 +(110), images[8], '100m Swim', null, 'medium', 'sport')]
       sport.forEach(function(self) {
     self.createIcon()
   });
@@ -122,6 +127,77 @@ function optionScreen() {
   text("Reset my Athlete data:", width * .2, height * .45);
   var reset = new button(width * .7, height * .45, "Reset", null, 'medium', 'resetuserdata');
   reset.createButton();
+}
+
+var raceprogress = 0;
+var leftcontrol = true;
+var rightcontrol = false;
+var userspeedvar = 0;
+var prevframe = 0;
+function sprint() {
+  //racetrack
+  rectMode(CORNER);
+  stroke(255,255,255);
+  fill(20,200,20);
+  rect(0,0,width,height*.4);
+  rect(0,height*.8,width,height*.2);
+  fill(200,20,20);
+  rect(0,height*.4,width,height*.4);
+  line(0,height*.5,width,height*.5);
+  line(0,height*.6,width,height*.6);
+  line(0,height*.7,width,height*.7);
+  
+  //Movement effect
+  line((width*.1)-raceprogress,height*.8,(width*.3)-raceprogress,height*.4);
+  line((width*.6)-raceprogress,height*.8,(width*.8)-raceprogress,height*.4);
+  line((width*1.1)-raceprogress,height*.8,(width*1.3)-raceprogress,height*.4);
+  line((width*1.6)-raceprogress,height*.8,(width*1.8)-raceprogress,height*.4);
+  line((width*2.1)-raceprogress,height*.8,(width*2.3)-raceprogress,height*.4);
+  line((width*2.6)-raceprogress,height*.8,(width*2.8)-raceprogress,height*.4);
+  line((width*3.1)-raceprogress,height*.8,(width*3.3)-raceprogress,height*.4);
+  line((width*3.6)-raceprogress,height*.8,(width*3.8)-raceprogress,height*.4);
+  line((width*4.1)-raceprogress,height*.8,(width*4.3)-raceprogress,height*.4);
+  line((width*4.6)-raceprogress,height*.8,(width*4.8)-raceprogress,height*.4);
+  line((width*5.1)-raceprogress,height*.8,(width*5.3)-raceprogress,height*.4);
+  line((width*5.6)-raceprogress,height*.8,(width*5.8)-raceprogress,height*.4);
+  
+  //natural slowdown effect
+  if (userspeedvar > 0) {userspeedvar= (userspeedvar - (userspeedvar*0.01))};
+  if (userspeedvar < 0) {userspeedvar = 0;}
+  
+  //User runner
+  
+  gifs[1].frame(floor(userspeedvar%gifs[1].totalFrames()));
+  image(gifs[1],width/2,height/2);
+  console.log(floor(raceprogress%gifs[1].totalFrames()));
+  
+  
+  //'a' & 'd' control movement  
+  if (keyIsPressed){
+    if (key === "a"){
+     if (rightcontrol == false && leftcontrol == true){
+      leftcontrol = false;
+      console.log(leftcontrol);
+      rightcontrol = true;
+      userspeedvar=userspeedvar + 1;
+      console.log(raceprogress);
+    }
+    }
+  if (key === "d"){
+      if (leftcontrol == false && rightcontrol == true){
+      rightcontrol = false;
+      leftcontrol = true;
+      userspeedvar=userspeedvar + 1;
+      console.log(raceprogress);
+    }
+  }
+  }
+  
+  raceprogress=raceprogress + userspeedvar;
+  
+  //Navbar
+  navbar = new Navbar(eventsScreen);
+  navbar.createnavbar();
 }
 
 function editAthleteScreen() {
@@ -401,8 +477,8 @@ function icon(xCenter, yCenter, pic, label, target, size, type) {
   }
   this.onclick = function(a) {
     if (mouseIsPressed) {
-      if (a == 'navigate') {
-        this.clicknav();
+      if (a == 'sport') {
+        gamestate = this.target;
       } else if (a == 'nationalset') {
         user.nationalset(this.target);
 
