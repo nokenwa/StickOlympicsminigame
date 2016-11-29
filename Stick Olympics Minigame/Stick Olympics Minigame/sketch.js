@@ -135,16 +135,41 @@ var raceprogress = 0;
 var leftcontrol = true;
 var rightcontrol = false;
 var userspeedvar = 0;
-var prevframe = 0;
-
+var userposition = 500;
+var competitors = []
+var automove = 0;
+var difficulty = 10;
+var gamestart = 0;
 function sprintsetup(){  
   refresh();
   audience = new crowd(width*.1,height*.2,10000,height*.1);
   audience.create();
   gamestate = sprint;
+  userspeedvar = 0;
+  automove = 0;
+  leftcontrol = true;
+  rightcontrol = false;
+  raceprogress = 0;
+  gamestart = 0;
+  for (var i=0; i<3; i++){
+    competitors[i]= new athlete();
+  }
+  
+  gamestate = sprint;
+  
 }
 
 function sprint() {
+  if(gamestart == 0){
+    background(0,255,0);
+    text("Press any Key to begin",width*.5,height/2);
+    text("Press 'A' and 'D' on your keyboard to run", width*.5,height*.7);
+    
+    if(keyIsPressed){gamestart=1}
+    
+  }
+  if (gamestart == 1)
+  {
   //racetrack
   rectMode(CORNER);
   stroke(255, 255, 255);
@@ -158,6 +183,12 @@ function sprint() {
   line(0, height * .7, width, height * .7);
 
   //Movement effect
+  textSize(100);
+  fill(255);
+  text("1",width*.2 - raceprogress,height*.48)
+  text("2",width*.15 - raceprogress,height*.58)
+  text("3",width*.1 - raceprogress,height*.68)
+  text("4",width*.05 - raceprogress,height*.78)
   line((width * .1) - raceprogress, height * .8, (width * .3) - raceprogress, height * .4);
   line((width * .6) - raceprogress, height * .8, (width * .8) - raceprogress, height * .4);
   line((width * 1.1) - raceprogress, height * .8, (width * 1.3) - raceprogress, height * .4);
@@ -170,11 +201,19 @@ function sprint() {
   line((width * 4.6) - raceprogress, height * .8, (width * 4.8) - raceprogress, height * .4);
   line((width * 5.1) - raceprogress, height * .8, (width * 5.3) - raceprogress, height * .4);
   line((width * 5.6) - raceprogress, height * .8, (width * 5.8) - raceprogress, height * .4);
+    text("E",width*5.8 - raceprogress,height*.48)
+  text("N",width*5.8 - raceprogress,height*.58)
+  text("D",width*5.8 - raceprogress,height*.68)
+  text("!!!",width*5.8 - raceprogress,height*.78)
+  noFill();
+  
   
   // Audience
     audience.show(raceprogress);
+ 
+ 
   //natural slowdown effect
-  if (userspeedvar > 0) {
+   if (userspeedvar > 0) {
     userspeedvar = (userspeedvar - (userspeedvar * 0.01))
   };
   if (userspeedvar < 0) {
@@ -182,12 +221,18 @@ function sprint() {
   }
 
   //User runner
-
-  gifs[1].frame(floor(userspeedvar % gifs[1].totalFrames()));
-  image(gifs[1], width / 2, height / 2);
-  console.log(floor(raceprogress % gifs[1].totalFrames()));
-
-
+  user.run(userposition,height*.48,10,floor(raceprogress/5))
+  console.log(raceprogress);
+  if (raceprogress >= 14500){gamestart = 2;}
+  
+  
+  //CPU runners
+  competitors[0].run((userposition + 100 +automove + automove*(3)-raceprogress),height*.38,10,floor(automove*(.8)/10))
+  competitors[1].run((userposition - 100 +automove + automove*(2)-raceprogress),height*.58,10,floor(automove*(.7)/10))
+  competitors[2].run((userposition - 200 +automove + automove*(3)-raceprogress),height*.68,10,floor(automove*(.7)/10))
+  automove+=difficulty;
+  
+  if (((userposition + 100 +automove + automove*(3)-raceprogress))>=14500){gamestart = 3}
   //'a' & 'd' control movement  
   if (keyIsPressed) {
     if (key === "a") {
@@ -196,7 +241,6 @@ function sprint() {
         console.log(leftcontrol);
         rightcontrol = true;
         userspeedvar = userspeedvar + 1;
-        console.log(raceprogress);
       }
     }
     if (key === "d") {
@@ -204,12 +248,37 @@ function sprint() {
         rightcontrol = false;
         leftcontrol = true;
         userspeedvar = userspeedvar + 1;
-        console.log(raceprogress);
       }
     }
   }
 
   raceprogress = raceprogress + userspeedvar;
+}
+
+
+  if(gamestart == 2){
+    background(0,255,0);
+    text("You Won",width*.5,height/2);
+    text("Press any key to restart", width*.5,height*.7);
+    
+    if(keyIsPressed){gamestart=0}
+    
+  }
+  
+  
+  if(gamestart == 3){
+    background(0,255,0);
+    text("You lost",width*.5,height/2);
+    text("Press any key to restart", width*.5,height*.7);
+    
+    if(keyIsPressed){gamestart=0}
+    
+  }
+
+
+
+
+
 
   //Navbar
   navbar = new Navbar(eventsScreen);
@@ -317,6 +386,75 @@ function athlete() {
     fill(0);
 
   };
+  
+  this.run = function(posx,posy,sf,frame){
+    
+  fill(this.colour);
+  stroke(this.colour);
+  strokeWeight(sf);
+    
+  if ((frame%5)==1){ ellipse(posx,posy,5*sf,5*sf); //head
+  line(posx,posy,posx-(1*sf),posy+(10*sf)) //body
+  line(posx-(2*sf),posy+(4*sf),posx+(-1*sf),posy+(5*sf)) //elbow left
+  line(posx+(-1*sf),posy+(5*sf),posx+(1*sf),posy+(6*sf)) //elbow right
+  line(posx+(1*sf),posy+(6*sf),posx+(3*sf),posy+(4*sf)) //hand right
+  line(posx-(2*sf),posy+(4*sf),posx-(3*sf),posy+(6*sf)) //hand left
+  line(posx-(1*sf),posy+(10*sf),posx-(3*sf),posy+(12*sf)) //knee left
+  line(posx-(3*sf),posy+(12*sf),posx-(5*sf),posy+(11*sf)) //foot left
+  line(posx-(1*sf),posy+(10*sf),posx+(1*sf),posy+(9*sf)) //knee right
+  line(posx+(1*sf),posy+(9*sf),posx+(2*sf),posy+(12*sf)) //foot right}
+  }
+  if (frame%5==2){
+    ellipse(posx,posy,5*sf,5*sf); //head
+  line(posx,posy,posx-(1*sf),posy+(10*sf)) //body
+  line(posx-(3*sf),posy+(6*sf),posx+(-1*sf),posy+(5*sf)) //elbow left
+  line(posx+(-1*sf),posy+(5*sf),posx+(0*sf),posy+(7*sf)) //elbow right
+  line(posx+(0*sf),posy+(7*sf),posx+(2*sf),posy+(7*sf)) //handright
+  line(posx-(2*sf),posy+(8*sf),posx-(3*sf),posy+(6*sf))//handleft
+  line(posx-(1*sf),posy+(10*sf),posx-(2*sf),posy+(12*sf)) //knee left
+  line(posx-(2*sf),posy+(12*sf),posx-(3*sf),posy+(12*sf)) //foot left
+  line(posx-(1*sf),posy+(10*sf),posx+(0*sf),posy+(10*sf)) //knee right
+  line(posx+(0*sf),posy+(10*sf),posx+(-1*sf),posy+(15*sf)) // foot right
+  }
+  if (frame%5==3){
+        ellipse(posx,posy,5*sf,5*sf); //head
+  line(posx,posy,posx-(1*sf),posy+(10*sf)) //body
+  line(posx-(2*sf),posy+(7*sf),posx+(-1*sf),posy+(5*sf)) //elbow left
+  line(posx+(-1*sf),posy+(5*sf),posx+(-1.5*sf),posy+(7*sf)) //elbow right
+  line(posx+(-1.5*sf),posy+(7*sf),posx+(1*sf),posy+(8*sf)) //handright
+  line(posx-(2*sf),posy+(7*sf),posx-(2.25*sf),posy+(8*sf))//handleft
+  line(posx-(1*sf),posy+(10*sf),posx-(1*sf),posy+(13*sf)) //knee left
+  line(posx-(1*sf),posy+(13*sf),posx-(2*sf),posy+(14*sf)) //foot left
+  line(posx-(1*sf),posy+(10*sf),posx+(1*sf),posy+(11*sf)) //knee right
+  line(posx+(1*sf),posy+(11*sf),posx+(-2*sf),posy+(13*sf)) // foot right
+  }
+  if (frame%5==4){
+     ellipse(posx,posy,5*sf,5*sf); //head
+  line(posx,posy,posx-(1*sf),posy+(10*sf)) //body
+  line(posx-(1*sf),posy+(7*sf),posx+(-1*sf),posy+(5*sf)) //elbow left
+  line(posx+(-1*sf),posy+(5*sf),posx+(0*sf),posy+(7*sf)) //elbow right
+  line(posx+(0*sf),posy+(7*sf),posx+(1*sf),posy+(8*sf)) //handright
+  line(posx-(1*sf),posy+(7*sf),posx-(-2*sf),posy+(7*sf))//handleft
+  line(posx-(1*sf),posy+(10*sf),posx-(2*sf),posy+(13*sf)) //knee left
+  line(posx-(2*sf),posy+(13*sf),posx-(4*sf),posy+(14.5*sf)) //foot left
+  line(posx-(1*sf),posy+(10*sf),posx+(1*sf),posy+(12*sf)) //knee right
+  line(posx+(1*sf),posy+(12*sf),posx+(0.5*sf),posy+(15*sf)) // foot right
+  }
+  if (frame%5==0){
+      ellipse(posx,posy,5*sf,5*sf); //head
+  line(posx,posy,posx-(1*sf),posy+(10*sf)) //body
+  line(posx-(2*sf),posy+(5*sf),posx+(-1*sf),posy+(5*sf)) //elbow left
+  line(posx+(-1*sf),posy+(5*sf),posx+(1*sf),posy+(6*sf)) //elbow right
+  line(posx+(1*sf),posy+(6*sf),posx+(2*sf),posy+(5*sf)) //hand right
+  line(posx-(2*sf),posy+(5*sf),posx-(2*sf),posy+(7*sf)) //hand left
+  line(posx-(1*sf),posy+(10*sf),posx-(2.5*sf),posy+(13*sf)) //knee left
+  line(posx-(2.5*sf),posy+(13*sf),posx-(5*sf),posy+(13*sf)) //foot left
+  line(posx-(1*sf),posy+(10*sf),posx+(2*sf),posy+(12*sf)) //knee right
+  line(posx+(2*sf),posy+(12*sf),posx+(3*sf),posy+(15*sf)) // foot right
+  }
+    
+    
+  }
 
   this.genderset = function(a) {
     if (a == 'male') {
@@ -346,12 +484,9 @@ function athlete() {
       this.flag = images[4];
       console.log('France set')
     }
-
   }
 
 }
-
-
 
 function crowd(a,b,c,d){
   this.xpos = a;
