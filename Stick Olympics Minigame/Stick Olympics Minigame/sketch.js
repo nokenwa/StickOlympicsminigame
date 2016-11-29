@@ -1,16 +1,17 @@
 var gamestate;
 var user;
-var imagepaths = ["media/images/athlete/vest.png", "media/images/flags/gb.png", "media/images/flags/usa.png", "media/images/flags/china.png", "media/images/flags/france.png", "media/images/athlete/faces/happy.png", "media/images/athlete/faces/sad.png", "media/images/athlete/faces/straight.png","media/images/icons/100m.png"];
+var imagepaths = ["media/images/athlete/vest.png", "media/images/flags/gb.png", "media/images/flags/usa.png", "media/images/flags/china.png", "media/images/flags/france.png", "media/images/athlete/faces/happy.png", "media/images/athlete/faces/sad.png", "media/images/athlete/faces/straight.png", "media/images/icons/100m.png"];
 var images = [];
 var navbar;
 var soundpaths = ["media/sounds/menumusic.mp3"];
 var sounds = [];
-var gifpaths = ['media/animatedimages/olympicrings.gif','media/animatedimages/sprintstick.gif']
+var gifpaths = ['media/animatedimages/olympicrings.gif', 'media/animatedimages/sprintstick.gif']
 var gifs = [];
 var sliders = []; // slider[0] = background volume, slider[1] = ingame sfx volume
+var audience;
 
 function setup() {
-  createCanvas(1366, 768);
+  createCanvas(displayWidth, displayHeight);
   gamestate = loadScreen;
   user = new athlete();
   sounds[0].loop();
@@ -23,21 +24,23 @@ function setup() {
 }
 
 function preload() {
-  console.log("hello")
-  for (var i = 0; i < imagepaths.length; i++)
+  for (var i = 0; i < imagepaths.length; i++) {
     images[i] = loadImage(imagepaths[i]);
+  }
+  console.log('Images Loaded')
 
-  for (var i = 0; i < soundpaths.length; i++)
+  for (var i = 0; i < soundpaths.length; i++) {
     sounds[i] = loadSound(soundpaths[i]);
-  
-    for (var i = 0; i < gifpaths.length; i++){
-    gifs[i] = loadGif(gifpaths[i]);}
+  }
+  console.log('Sounds Loaded')
 
-
+  for (var i = 0; i < gifpaths.length; i++) {
+    gifs[i] = loadGif(gifpaths[i]);
+  }
+  console.log('Gifs Loaded')
 }
 
 function draw() {
-
   gamestate();
 }
 
@@ -49,8 +52,8 @@ function loadScreen() {
   textFont("Comic Sans MS");
   text("Welcome to the Stick Olympics Minigame!!!", width / 2, height * .1);
 
- 
-  image(gifs[0], width/2, height*.8);
+
+  image(gifs[0], width / 2, height * .8);
 
   textSize(48);
   text("Pick an Option Below!!!", width / 2, height * .2);
@@ -60,7 +63,7 @@ function loadScreen() {
   user.stand();
   var optionsbutton = new button(width * .2, height * .9, "Options", optionScreen, 'medium', 'navigate');
   optionsbutton.createButton();
-  var beginbutton = new button(width / 2, height/2, "Begin", eventsScreen, 'large', 'navigate');
+  var beginbutton = new button(width / 2, height / 2, "Begin", eventsScreen, 'large', 'navigate');
   beginbutton.createButton();
 }
 
@@ -76,21 +79,20 @@ function eventsScreen() {
   textAlign(CENTER);
   textFont("Comic Sans MS");
   text("Choose an Event", width / 2, height * .1);
-  
+
   //Individual Events
-   textSize(35);
+  textSize(35);
   textAlign(LEFT);
   text("Individual events:", width * .05, height * .2);
   textSize(25);
   noFill();
   stroke(0);
   rectMode(CORNERS);
-  rect (width *.05, height*.25, width*.5, height *.75,25)
-    var sport = [new icon(width * .1, height * .35, images[8], '100m Sprint', sprint, 'medium', 'sport'),new icon(width * .1, height * .35 +(110), images[8], '100m Swim', null, 'medium', 'sport')]
-      sport.forEach(function(self) {
+  rect(width * .05, height * .25, width * .5, height * .75, 25)
+  var sport = [new icon(width * .1, height * .35, images[8], '100m Sprint', sprintsetup, 'medium', 'sport'), new icon(width * .1, height * .35 + (110), images[8], '100m Swim', null, 'medium', 'sport')]
+  sport.forEach(function(self) {
     self.createIcon()
   });
-  console.log('done')
 
 }
 
@@ -134,67 +136,81 @@ var leftcontrol = true;
 var rightcontrol = false;
 var userspeedvar = 0;
 var prevframe = 0;
+
+function sprintsetup(){  
+  refresh();
+  audience = new crowd(width*.1,height*.2,10000,height*.1);
+  audience.create();
+  gamestate = sprint;
+}
+
 function sprint() {
   //racetrack
   rectMode(CORNER);
-  stroke(255,255,255);
-  fill(20,200,20);
-  rect(0,0,width,height*.4);
-  rect(0,height*.8,width,height*.2);
-  fill(200,20,20);
-  rect(0,height*.4,width,height*.4);
-  line(0,height*.5,width,height*.5);
-  line(0,height*.6,width,height*.6);
-  line(0,height*.7,width,height*.7);
-  
+  stroke(255, 255, 255);
+  fill(20, 200, 20);
+  rect(0, 0, width, height * .4);
+  rect(0, height * .8, width, height * .2);
+  fill(200, 20, 20);
+  rect(0, height * .4, width, height * .4);
+  line(0, height * .5, width, height * .5);
+  line(0, height * .6, width, height * .6);
+  line(0, height * .7, width, height * .7);
+
   //Movement effect
-  line((width*.1)-raceprogress,height*.8,(width*.3)-raceprogress,height*.4);
-  line((width*.6)-raceprogress,height*.8,(width*.8)-raceprogress,height*.4);
-  line((width*1.1)-raceprogress,height*.8,(width*1.3)-raceprogress,height*.4);
-  line((width*1.6)-raceprogress,height*.8,(width*1.8)-raceprogress,height*.4);
-  line((width*2.1)-raceprogress,height*.8,(width*2.3)-raceprogress,height*.4);
-  line((width*2.6)-raceprogress,height*.8,(width*2.8)-raceprogress,height*.4);
-  line((width*3.1)-raceprogress,height*.8,(width*3.3)-raceprogress,height*.4);
-  line((width*3.6)-raceprogress,height*.8,(width*3.8)-raceprogress,height*.4);
-  line((width*4.1)-raceprogress,height*.8,(width*4.3)-raceprogress,height*.4);
-  line((width*4.6)-raceprogress,height*.8,(width*4.8)-raceprogress,height*.4);
-  line((width*5.1)-raceprogress,height*.8,(width*5.3)-raceprogress,height*.4);
-  line((width*5.6)-raceprogress,height*.8,(width*5.8)-raceprogress,height*.4);
+  line((width * .1) - raceprogress, height * .8, (width * .3) - raceprogress, height * .4);
+  line((width * .6) - raceprogress, height * .8, (width * .8) - raceprogress, height * .4);
+  line((width * 1.1) - raceprogress, height * .8, (width * 1.3) - raceprogress, height * .4);
+  line((width * 1.6) - raceprogress, height * .8, (width * 1.8) - raceprogress, height * .4);
+  line((width * 2.1) - raceprogress, height * .8, (width * 2.3) - raceprogress, height * .4);
+  line((width * 2.6) - raceprogress, height * .8, (width * 2.8) - raceprogress, height * .4);
+  line((width * 3.1) - raceprogress, height * .8, (width * 3.3) - raceprogress, height * .4);
+  line((width * 3.6) - raceprogress, height * .8, (width * 3.8) - raceprogress, height * .4);
+  line((width * 4.1) - raceprogress, height * .8, (width * 4.3) - raceprogress, height * .4);
+  line((width * 4.6) - raceprogress, height * .8, (width * 4.8) - raceprogress, height * .4);
+  line((width * 5.1) - raceprogress, height * .8, (width * 5.3) - raceprogress, height * .4);
+  line((width * 5.6) - raceprogress, height * .8, (width * 5.8) - raceprogress, height * .4);
   
+  // Audience
+    audience.show(raceprogress);
   //natural slowdown effect
-  if (userspeedvar > 0) {userspeedvar= (userspeedvar - (userspeedvar*0.01))};
-  if (userspeedvar < 0) {userspeedvar = 0;}
-  
+  if (userspeedvar > 0) {
+    userspeedvar = (userspeedvar - (userspeedvar * 0.01))
+  };
+  if (userspeedvar < 0) {
+    userspeedvar = 0;
+  }
+
   //User runner
-  
-  gifs[1].frame(floor(userspeedvar%gifs[1].totalFrames()));
-  image(gifs[1],width/2,height/2);
-  console.log(floor(raceprogress%gifs[1].totalFrames()));
-  
-  
+
+  gifs[1].frame(floor(userspeedvar % gifs[1].totalFrames()));
+  image(gifs[1], width / 2, height / 2);
+  console.log(floor(raceprogress % gifs[1].totalFrames()));
+
+
   //'a' & 'd' control movement  
-  if (keyIsPressed){
-    if (key === "a"){
-     if (rightcontrol == false && leftcontrol == true){
-      leftcontrol = false;
-      console.log(leftcontrol);
-      rightcontrol = true;
-      userspeedvar=userspeedvar + 1;
-      console.log(raceprogress);
+  if (keyIsPressed) {
+    if (key === "a") {
+      if (rightcontrol == false && leftcontrol == true) {
+        leftcontrol = false;
+        console.log(leftcontrol);
+        rightcontrol = true;
+        userspeedvar = userspeedvar + 1;
+        console.log(raceprogress);
+      }
     }
-    }
-  if (key === "d"){
-      if (leftcontrol == false && rightcontrol == true){
-      rightcontrol = false;
-      leftcontrol = true;
-      userspeedvar=userspeedvar + 1;
-      console.log(raceprogress);
+    if (key === "d") {
+      if (leftcontrol == false && rightcontrol == true) {
+        rightcontrol = false;
+        leftcontrol = true;
+        userspeedvar = userspeedvar + 1;
+        console.log(raceprogress);
+      }
     }
   }
-  }
-  
-  raceprogress=raceprogress + userspeedvar;
-  
+
+  raceprogress = raceprogress + userspeedvar;
+
   //Navbar
   navbar = new Navbar(eventsScreen);
   navbar.createnavbar();
@@ -252,7 +268,6 @@ function editAthleteScreen() {
     this.checkclick = function() {
       if (hover(width * .1 + (10 + this.n * (60)), height * .3 + 15, width * .1 + (10 + this.n * (60)) + 50, height * .3 + 65)) {
         user.colour = a;
-        console.log(a);
       }
     }
 
@@ -265,8 +280,6 @@ function editAthleteScreen() {
     });
   }
 }
-
-
 
 function athlete() {
   this.name = "yourname";
@@ -338,6 +351,61 @@ function athlete() {
 
 }
 
+
+
+function crowd(a,b,c,d){
+  this.xpos = a;
+  this.ypos = b;
+  this.xsize = c;
+  this.ysize = d;
+  this.container = [];
+  
+  
+  this.create = function (){
+    for(var i = 0; i<(this.xsize/50);i++){
+      this.container[i] = [];
+      for(var j = 0; j<(this.ysize/50); j++){
+        this.container[i][j] = new face(this.xpos + (i*50),this.ypos + (j*50));
+      }
+    }
+  }
+      
+  this.show = function(a){
+    rectMode(CORNER)
+    rect(this.xpos-30-a,this.ypos-30,this.xsize+10,this.ysize+50,20)
+    for(var i = 0; i<(this.xsize/50);i++){
+      for(var j = 0; j<(this.ysize/50); j++){
+     this.container[i][j].show(a);
+     this.container[i][j].wobble();
+        }}
+  }
+  
+  }
+
+function face(a,b){
+  this.posx = a;
+  this.posy = b;
+  this.rcolor = random(100,255);
+  this.gcolor = random(100,255);
+  this.bcolor = random(100,255);
+  
+  this.show = function(a){
+  fill(this.rcolor,this.gcolor,this.bcolor);
+   rectMode(CENTER);
+  rect(this.posx-a,this.posy+37,50,50,20);
+  rectMode(CORNER);
+  ellipse(this.posx-a,this.posy,50,50);
+  imageMode(CENTER);
+  image(images[5],this.posx-a,this.posy,50,50);
+ 
+  
+  }
+  
+  this.wobble = function(){
+    this.posx= a + random(-1,1);
+    this.poxy= a + random(-1,1);
+  }
+}
 
 function Navbar(backTarget) {
   this.backbutton = new button(width * .05, height * .07, "Back", backTarget, 'medium', 'navigate');
@@ -444,31 +512,31 @@ function icon(xCenter, yCenter, pic, label, target, size, type) {
       }
       rect(this.posx, this.posy, 76, 76);
       image(this.picture, this.posx, this.posy, 75, 75);
-      text(label, this.posx , this.posy + 60);
+      text(label, this.posx, this.posy + 60);
 
     } else if (this.size == 'large') {
       if (hover(this.posx - 50, this.posy - 50, this.posx + 50, this.posy + 50)) {
         strokeWeight(5);
         this.onclick(this.type);
       }
-       rect(this.posx, this.posy, 101, 101);
+      rect(this.posx, this.posy, 101, 101);
       image(this.picture, this.posx, this.posy, 100, 100);
-      text(label, this.posx , this.posy + 60);
+      text(label, this.posx, this.posy + 60);
     } else if (this.size == 'small') {
       if (hover(this.posx - (this.label.length * 5), this.posy - 18, this.posx + (this.label.length * 5), this.posy + 8)) {
         strokeWeight(5);
         this.onclick(this.type);
       }
       rect(this.posx, this.posy - 5, this.label.length * 10, 25, 20);
-      text(label, this.posx , this.posy + 60);
+      text(label, this.posx, this.posy + 60);
     } else {
-    
+
       rect(this.posx, this.posy - 10, this.label.length * 20, 55, 20);
       this.onclick(this.type);
-      text(label, this.posx , this.posy + 60);
+      text(label, this.posx, this.posy + 60);
     }
-    
-    
+
+
     noStroke(0);
     fill(0);
     console.log('achieved');
@@ -488,11 +556,9 @@ function icon(xCenter, yCenter, pic, label, target, size, type) {
   }
 }
 
-function hover(leftLimit, upperLimit, rightLimit, bottomLimit) {
-  if (mouseX >= leftLimit && mouseX <= rightLimit && mouseY >= upperLimit && mouseY <= bottomLimit) {
+function hover(leftLimit, upperLimit, rightLimit, bottomLimit) {if (mouseX >= leftLimit && mouseX <= rightLimit && mouseY >= upperLimit && mouseY <= bottomLimit) {
     return true;
-  } else return false;
-}
+  } else return false;}
 
 function refresh() {
   sliders[0].hide();
