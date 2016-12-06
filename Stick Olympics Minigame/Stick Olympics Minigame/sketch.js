@@ -1,6 +1,6 @@
 var gamestate;
 var user;
-var imagepaths = ["media/images/athlete/vest.png", "media/images/flags/gb.png", "media/images/flags/usa.png", "media/images/flags/china.png", "media/images/flags/france.png", "media/images/athlete/faces/happy.png", "media/images/athlete/faces/sad.png", "media/images/athlete/faces/straight.png", "media/images/icons/100m.png"];
+var imagepaths = ["media/images/athlete/vest.png", "media/images/flags/gb.png", "media/images/flags/usa.png", "media/images/flags/china.png", "media/images/flags/france.png", "media/images/athlete/faces/happy.png", "media/images/athlete/faces/sad.png", "media/images/athlete/faces/straight.png", "media/images/icons/100m.png","media/images/others/trophycabinet.png","media/images/others/trophy.png"];
 var images = [];
 var navbar;
 var soundpaths = ["media/sounds/menumusic.mp3"];
@@ -42,6 +42,7 @@ function preload() {
 
 function draw() {
   gamestate();
+ 
 }
 
 function loadScreen() {
@@ -65,6 +66,8 @@ function loadScreen() {
   optionsbutton.createButton();
   var beginbutton = new button(width / 2, height / 2, "Begin", eventsScreen, 'large', 'navigate');
   beginbutton.createButton();
+  
+   user.trophies.drawcabinet();
 }
 
 function eventsScreen() {
@@ -138,11 +141,11 @@ var userspeedvar = 0;
 var userposition = 500;
 var competitors = []
 var automove = 0;
-var difficulty = 10;
+var difficulty = 4;
 var gamestart = 0;
 function sprintsetup(){  
   refresh();
-  audience = new crowd(width*.1,height*.2,10000,height*.1);
+  audience = new crowd(width*.1,height*.2,width*5.8,height*.1);
   audience.create();
   gamestate = sprint;
   userspeedvar = 0;
@@ -168,8 +171,7 @@ function sprint() {
     if(keyIsPressed){gamestart=1}
     
   }
-  if (gamestart == 1)
-  {
+  if (gamestart == 1){
   //racetrack
   rectMode(CORNER);
   stroke(255, 255, 255);
@@ -221,15 +223,15 @@ function sprint() {
   }
 
   //User runner
-  user.run(userposition,height*.48,10,floor(raceprogress/5))
+  user.run(userposition,height*.45,10,floor(raceprogress/5))
   console.log(raceprogress);
-  if (raceprogress >= 14500){gamestart = 2;}
+  if (raceprogress >= width*5.5){gamestart = 2;}
   
   
   //CPU runners
-  competitors[0].run((userposition + 100 +automove + automove*(3)-raceprogress),height*.38,10,floor(automove*(.8)/10))
-  competitors[1].run((userposition - 100 +automove + automove*(2)-raceprogress),height*.58,10,floor(automove*(.7)/10))
-  competitors[2].run((userposition - 200 +automove + automove*(3)-raceprogress),height*.68,10,floor(automove*(.7)/10))
+  competitors[0].run((userposition + 100 +automove + automove*(3)-raceprogress),height*.35,10,floor(automove*(.8)/10))
+  competitors[1].run((userposition - 100 +automove + automove*(2)-raceprogress),height*.55,10,floor(automove*(.7)/10))
+  competitors[2].run((userposition - 200 +automove + automove*(3)-raceprogress),height*.65,10,floor(automove*(.7)/10))
   automove+=difficulty;
   
   if (((userposition + 100 +automove + automove*(3)-raceprogress))>=14500){gamestart = 3}
@@ -254,33 +256,21 @@ function sprint() {
 
   raceprogress = raceprogress + userspeedvar;
 }
-
-
   if(gamestart == 2){
     background(0,255,0);
     text("You Won",width*.5,height/2);
     text("Press any key to restart", width*.5,height*.7);
-    
     if(keyIsPressed){gamestart=0}
     
   }
-  
-  
   if(gamestart == 3){
     background(0,255,0);
     text("You lost",width*.5,height/2);
     text("Press any key to restart", width*.5,height*.7);
-    
     if(keyIsPressed){gamestart=0}
     
   }
-
-
-
-
-
-
-  //Navbar
+  Navbar
   navbar = new Navbar(eventsScreen);
   navbar.createnavbar();
 }
@@ -359,6 +349,7 @@ function athlete() {
   this.number = "01";
   this.centrepointx = width * .8;
   this.centrepointy = height / 2;
+  this.trophies = new achievements();
 
 
   this.stand = function() {
@@ -488,6 +479,27 @@ function athlete() {
 
 }
 
+function achievements() {
+  this.cabinet = [[],[],[],[]];
+  
+  this.drawcabinet = function() {
+    imageMode(CENTER);
+    image(images[9],width*.25,height*.5);
+    for(var i=0; i<=this.cabinet.length; i++){
+      for(var j=0: j<this.cabinet[i].length;i++){
+        if(this.cabinet[i][j] = null){ return null; }
+        else (image)
+      }
+    }
+  }
+  this.addtrophy = function(event){
+    
+    this.cabinet.push();
+    
+  }
+  
+}
+
 function crowd(a,b,c,d){
   this.xpos = a;
   this.ypos = b;
@@ -538,7 +550,7 @@ function face(a,b){
   
   this.wobble = function(){
     this.posx= a + random(-1,1);
-    this.poxy= a + random(-1,1);
+    this.poxy= b + random(-1,1);
   }
 }
 
@@ -642,7 +654,7 @@ function icon(xCenter, yCenter, pic, label, target, size, type) {
     textSize(16);
     if (this.size == 'medium') {
       if (hover(this.posx - 38, this.posy - 38, this.posx + 38, this.posy + 38)) {
-        strokeWeight(5);
+        stroke(255);
         this.onclick(this.type);
       }
       rect(this.posx, this.posy, 76, 76);
@@ -651,7 +663,7 @@ function icon(xCenter, yCenter, pic, label, target, size, type) {
 
     } else if (this.size == 'large') {
       if (hover(this.posx - 50, this.posy - 50, this.posx + 50, this.posy + 50)) {
-        strokeWeight(5);
+        stroke(255);
         this.onclick(this.type);
       }
       rect(this.posx, this.posy, 101, 101);
@@ -659,7 +671,7 @@ function icon(xCenter, yCenter, pic, label, target, size, type) {
       text(label, this.posx, this.posy + 60);
     } else if (this.size == 'small') {
       if (hover(this.posx - (this.label.length * 5), this.posy - 18, this.posx + (this.label.length * 5), this.posy + 8)) {
-        strokeWeight(5);
+        stroke(255);
         this.onclick(this.type);
       }
       rect(this.posx, this.posy - 5, this.label.length * 10, 25, 20);
