@@ -42,7 +42,8 @@ function preload() {
 
 function draw() {
   gamestate();
- 
+
+
 }
 
 function loadScreen() {
@@ -66,8 +67,9 @@ function loadScreen() {
   optionsbutton.createButton();
   var beginbutton = new button(width / 2, height / 2, "Begin", eventsScreen, 'large', 'navigate');
   beginbutton.createButton();
-  
-   user.trophies.drawcabinet();
+user.trophies.drawcabinet();
+
+   
 }
 
 function eventsScreen() {
@@ -143,7 +145,7 @@ var competitors = []
 var automove = 0;
 var difficulty = 4;
 var gamestart = 0;
-function sprintsetup(){  
+function sprintsetup(){
   refresh();
   audience = new crowd(width*.1,height*.2,width*5.8,height*.1);
   audience.create();
@@ -157,9 +159,9 @@ function sprintsetup(){
   for (var i=0; i<3; i++){
     competitors[i]= new athlete();
   }
-  
+
   gamestate = sprint;
-  
+
 }
 
 function sprint() {
@@ -167,9 +169,9 @@ function sprint() {
     background(0,255,0);
     text("Press any Key to begin",width*.5,height/2);
     text("Press 'A' and 'D' on your keyboard to run", width*.5,height*.7);
-    
+
     if(keyIsPressed){gamestart=1}
-    
+
   }
   if (gamestart == 1){
   //racetrack
@@ -184,7 +186,6 @@ function sprint() {
   line(0, height * .6, width, height * .6);
   line(0, height * .7, width, height * .7);
 
-  //Movement effect
   textSize(100);
   fill(255);
   text("1",width*.2 - raceprogress,height*.48)
@@ -208,12 +209,12 @@ function sprint() {
   text("D",width*5.8 - raceprogress,height*.68)
   text("!!!",width*5.8 - raceprogress,height*.78)
   noFill();
-  
-  
+
+
   // Audience
     audience.show(raceprogress);
- 
- 
+
+
   //natural slowdown effect
    if (userspeedvar > 0) {
     userspeedvar = (userspeedvar - (userspeedvar * 0.01))
@@ -226,16 +227,16 @@ function sprint() {
   user.run(userposition,height*.45,10,floor(raceprogress/5))
   console.log(raceprogress);
   if (raceprogress >= width*5.5){gamestart = 2;}
-  
-  
+
+
   //CPU runners
   competitors[0].run((userposition + 100 +automove + automove*(3)-raceprogress),height*.35,10,floor(automove*(.8)/10))
   competitors[1].run((userposition - 100 +automove + automove*(2)-raceprogress),height*.55,10,floor(automove*(.7)/10))
   competitors[2].run((userposition - 200 +automove + automove*(3)-raceprogress),height*.65,10,floor(automove*(.7)/10))
   automove+=difficulty;
-  
+
   if (((userposition + 100 +automove + automove*(3)-raceprogress))>=14500){gamestart = 3}
-  //'a' & 'd' control movement  
+  //'a' & 'd' control movement
   if (keyIsPressed) {
     if (key === "a") {
       if (rightcontrol == false && leftcontrol == true) {
@@ -253,22 +254,21 @@ function sprint() {
       }
     }
   }
-
   raceprogress = raceprogress + userspeedvar;
 }
   if(gamestart == 2){
     background(0,255,0);
     text("You Won",width*.5,height/2);
-    text("Press any key to restart", width*.5,height*.7);
-    if(keyIsPressed){gamestart=0}
-    
+    text("Press any key to go back to the main menu", width*.5,height*.7);
+    if(keyIsPressed){user.trophies.addtrophy(); gamestate = loadScreen;}
+
   }
   if(gamestart == 3){
     background(0,255,0);
     text("You lost",width*.5,height/2);
     text("Press any key to restart", width*.5,height*.7);
     if(keyIsPressed){gamestart=0}
-    
+
   }
   Navbar
   navbar = new Navbar(eventsScreen);
@@ -350,6 +350,7 @@ function athlete() {
   this.centrepointx = width * .8;
   this.centrepointy = height / 2;
   this.trophies = new achievements();
+  this.trophies.createcabinet();
 
 
   this.stand = function() {
@@ -377,13 +378,13 @@ function athlete() {
     fill(0);
 
   };
-  
+
   this.run = function(posx,posy,sf,frame){
-    
+
   fill(this.colour);
   stroke(this.colour);
   strokeWeight(sf);
-    
+
   if ((frame%5)==1){ ellipse(posx,posy,5*sf,5*sf); //head
   line(posx,posy,posx-(1*sf),posy+(10*sf)) //body
   line(posx-(2*sf),posy+(4*sf),posx+(-1*sf),posy+(5*sf)) //elbow left
@@ -443,8 +444,8 @@ function athlete() {
   line(posx-(1*sf),posy+(10*sf),posx+(2*sf),posy+(12*sf)) //knee right
   line(posx+(2*sf),posy+(12*sf),posx+(3*sf),posy+(15*sf)) // foot right
   }
-    
-    
+
+
   }
 
   this.genderset = function(a) {
@@ -480,24 +481,37 @@ function athlete() {
 }
 
 function achievements() {
-  this.cabinet = [[],[],[],[]];
-  
+  this.cabinet = [];
+
+  this.createcabinet = function() {
+    for(var i=0; i<=6; i++){
+      this.cabinet[i] = [];
+        for(var j=0; j<=6; j++){
+      this.cabinet[i][j] = false;
+      console.log('building array...')
+        }
+  }}
+
   this.drawcabinet = function() {
+    imageMode(CORNER);
+    image(images[9],width*.005,height*.1);
+    for(var i=0; i<=6; i++){
+      for(var j=0; j<=6; j++){
+        if (this.cabinet[i][j] == true){image(images[10],j*width*.1,height*.1*i,width*.1,height*.1)}
+      }
+    }
     imageMode(CENTER);
-    image(images[9],width*.25,height*.5);
-    for(var i=0; i<=this.cabinet.length; i++){
-      for(var j=0: j<this.cabinet[i].length;i++){
-        if(this.cabinet[i][j] = null){ return null; }
-        else (image)
+  }
+
+  this.addtrophy = function(){
+    console.log('add trophy function is run')
+    for(var i=0; i<=5; i++){
+      for(var j=0; j<=5; j++){
+        if (this.cabinet[i][j] == false){this.cabinet[i][j] = true; return;}
       }
     }
   }
-  this.addtrophy = function(event){
-    
-    this.cabinet.push();
-    
-  }
-  
+
 }
 
 function crowd(a,b,c,d){
@@ -506,8 +520,8 @@ function crowd(a,b,c,d){
   this.xsize = c;
   this.ysize = d;
   this.container = [];
-  
-  
+
+
   this.create = function (){
     for(var i = 0; i<(this.xsize/50);i++){
       this.container[i] = [];
@@ -516,7 +530,7 @@ function crowd(a,b,c,d){
       }
     }
   }
-      
+
   this.show = function(a){
     rectMode(CORNER)
     rect(this.xpos-30-a,this.ypos-30,this.xsize+10,this.ysize+50,20)
@@ -526,7 +540,7 @@ function crowd(a,b,c,d){
      this.container[i][j].wobble();
         }}
   }
-  
+
   }
 
 function face(a,b){
@@ -535,7 +549,7 @@ function face(a,b){
   this.rcolor = random(100,255);
   this.gcolor = random(100,255);
   this.bcolor = random(100,255);
-  
+
   this.show = function(a){
   fill(this.rcolor,this.gcolor,this.bcolor);
    rectMode(CENTER);
@@ -544,10 +558,10 @@ function face(a,b){
   ellipse(this.posx-a,this.posy,50,50);
   imageMode(CENTER);
   image(images[5],this.posx-a,this.posy,50,50);
- 
-  
+
+
   }
-  
+
   this.wobble = function(){
     this.posx= a + random(-1,1);
     this.poxy= b + random(-1,1);
